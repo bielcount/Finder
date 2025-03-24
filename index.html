@@ -41,12 +41,19 @@
             text-align: center;
             margin-bottom: 10px;
             color: white;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .header h1 {
             font-size: 24px;
             margin-bottom: 5px;
             color: #6C63FF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .header p {
@@ -59,7 +66,7 @@
         .container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 10px; /* Espaçamento entre as colunas */
             justify-content: center;
             max-width: 1200px;
             width: 100%;
@@ -72,12 +79,15 @@
         .coluna-esquerda {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 10px; /* Espaçamento entre os cards */
             width: 100%; /* Ocupa 100% da largura em dispositivos móveis */
         }
 
-        /* Coluna Direita (CNPJ) */
+        /* Coluna Direita (CNPJ e CFOP Inverso) */
         .coluna-direita {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Espaçamento entre os cards */
             width: 100%; /* Ocupa 100% da largura em dispositivos móveis */
         }
 
@@ -89,7 +99,8 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 10px; /* Espaçamento interno */
+            flex: 1; /* Faz os cards terem a mesma altura */
         }
 
         .card h2 {
@@ -243,7 +254,11 @@
 
     <!-- Cabeçalho -->
     <div class="header">
-        <h1>Finder</h1>
+        <h1>
+            <a href="https://git.io/typing-svg">
+                <img src="https://readme-typing-svg.herokuapp.com?font=Boldonse&size=22&letterSpacing=0.2rem&pause=1000&color=5548D6&width=435&lines=Finder consulta tributação%F0%9F%94%8E" alt="Typing SVG" />
+            </a>
+        </h1>
         <p>
             O Finder é um sistema desenvolvido para facilitar consultas de dados tributários, como CFOP, CST, CSOSN, NCM e CNPJ.
             Com ele, você pode acessar informações detalhadas de forma rápida e eficiente.
@@ -312,7 +327,7 @@
             </div>
         </div>
 
-        <!-- Coluna Direita (CNPJ) -->
+        <!-- Coluna Direita (CNPJ e CFOP Inverso) -->
         <div class="coluna-direita">
             <!-- Card CNPJ -->
             <div class="card">
@@ -346,8 +361,22 @@
 
                 <!-- Aviso sobre o Render -->
                 <div class="aviso">
-                    <p><strong>Atenção:</strong> A API está hospedada no Render e por se tratar de um serviço gratuito pode demorar um pouco para retornar os dados após períodos de inatividade. Isso é normal e as consultas se normalizam após as primeiras requisições.</p>
+                    <p><strong>Atenção:</strong> A API está hospedada no Render e pode demorar um pouco para retornar os dados após períodos de inatividade. Isso é normal e as consultas se normalizam após as primeiras requisições.</p>
                 </div>
+            </div>
+
+            <!-- Card CFOP Inverso -->
+            <div class="card">
+                <h2>CFOP Inverso</h2>
+                <div class="input-group">
+                    <input type="text" id="cfop-entrada" placeholder="Digite o CFOP de compra">
+                    <button onclick="consultarCFOPInverso()">Consultar</button>
+                </div>
+                <div class="resultado" id="cfop-inverso-resultado">
+                    <p><strong>CFOP de Venda (Dentro do Estado):</strong> <span id="cfop-venda">-</span></p>
+                    <p><strong>CFOP de Venda (Fora do Estado):</strong> <span id="cfop-venda-fora">-</span></p>
+                </div>
+                <div class="error-message" id="cfop-inverso-error"></div>
             </div>
         </div>
     </div>
@@ -430,6 +459,55 @@
             } else {
                 button.classList.remove('loading');
                 button.disabled = false;
+            }
+        }
+
+        // Mapeamento de CFOPs
+        const mapeamentoCFOP = {
+            "1101": { venda: "5101", vendaFora: "6101" }, // Compra para industrialização
+            "1102": { venda: "5102", vendaFora: "6102" }, // Compra para comercialização
+            "1111": { venda: "5111", vendaFora: "6111" }, // Compra para industrialização de bem usado
+            "1113": { venda: "5113", vendaFora: "6113" }, // Compra para comercialização de bem usado
+            "1201": { venda: "5201", vendaFora: "6201" }, // Devolução de venda para industrialização
+            "1202": { venda: "5202", vendaFora: "6202" }, // Devolução de venda para comercialização
+            "1251": { venda: "5251", vendaFora: "6251" }, // Compra de energia elétrica
+            "1401": { venda: "5401", vendaFora: "6401" }, // Transferência para industrialização
+            "1403": { venda: "5403", vendaFora: "6403" }, // Transferência para comercialização
+            "1411": { venda: "5411", vendaFora: "6411" }, // Transferência de bem usado para industrialização
+            "1413": { venda: "5413", vendaFora: "6413" }, // Transferência de bem usado para comercialização
+            "2101": { venda: "5101", vendaFora: "6101" }, // Compra para industrialização (outro estado)
+            "2102": { venda: "5102", vendaFora: "6102" }, // Compra para comercialização (outro estado)
+            "2111": { venda: "5111", vendaFora: "6111" }, // Compra para industrialização de bem usado (outro estado)
+            "2113": { venda: "5113", vendaFora: "6113" }, // Compra para comercialização de bem usado (outro estado)
+            "2201": { venda: "5201", vendaFora: "6201" }, // Devolução de venda para industrialização (outro estado)
+            "2202": { venda: "5202", vendaFora: "6202" }, // Devolução de venda para comercialização (outro estado)
+            "2401": { venda: "5401", vendaFora: "6401" }, // Transferência para industrialização (outro estado)
+            "2403": { venda: "5403", vendaFora: "6403" }, // Transferência para comercialização (outro estado)
+            "2411": { venda: "5411", vendaFora: "6411" }, // Transferência de bem usado para industrialização (outro estado)
+            "2413": { venda: "5413", vendaFora: "6413" }, // Transferência de bem usado para comercialização (outro estado)
+        };
+
+        // Função para consultar CFOP Inverso
+        function consultarCFOPInverso() {
+            const cfopEntrada = document.getElementById('cfop-entrada').value;
+            const resultadoCFOPVenda = document.getElementById('cfop-venda');
+            const resultadoCFOPVendaFora = document.getElementById('cfop-venda-fora');
+            const mensagemErro = document.getElementById('cfop-inverso-error');
+
+            if (!cfopEntrada) {
+                mensagemErro.textContent = 'Por favor, insira um CFOP de compra.';
+                return;
+            }
+
+            // Verifica se o CFOP de entrada existe no mapeamento
+            if (mapeamentoCFOP[cfopEntrada]) {
+                resultadoCFOPVenda.textContent = mapeamentoCFOP[cfopEntrada].venda || '-';
+                resultadoCFOPVendaFora.textContent = mapeamentoCFOP[cfopEntrada].vendaFora || '-';
+                mensagemErro.textContent = '';
+            } else {
+                resultadoCFOPVenda.textContent = '-';
+                resultadoCFOPVendaFora.textContent = '-';
+                mensagemErro.textContent = 'CFOP de compra não encontrado ou sem inverso definido.';
             }
         }
 
