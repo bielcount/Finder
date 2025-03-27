@@ -6,6 +6,8 @@
     <title>Finder - Consulta de Tributação</title>
     <link rel="icon" type="image/x-icon" href="/assets/logo/logo5.svg">
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- Vercel Analytics Corrected -->
+    <script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
     <style>
         /* Reset */
         * {
@@ -23,7 +25,7 @@
             align-items: center;
             min-height: 100vh;
             background: #1f1f20;
-            overflow: auto; /* Permite rolagem */
+            overflow: auto;
             padding: 10px;
         }
 
@@ -66,29 +68,29 @@
         .container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px; /* Espaçamento entre as colunas */
+            gap: 10px;
             justify-content: center;
             max-width: 1200px;
             width: 100%;
-            height: auto; /* Altura automática */
-            padding-bottom: 20px; /* Espaço para o rodapé */
-            overflow-y: auto; /* Permite rolagem vertical */
+            height: auto;
+            padding-bottom: 20px;
+            overflow-y: auto;
         }
 
-        /* Coluna Esquerda (CFOP, CST, CSOSN, NCM) */
+        /* Coluna Esquerda */
         .coluna-esquerda {
             display: flex;
             flex-direction: column;
-            gap: 10px; /* Espaçamento entre os cards */
-            width: 100%; /* Ocupa 100% da largura em dispositivos móveis */
+            gap: 10px;
+            width: 100%;
         }
 
-        /* Coluna Direita (CNPJ e CFOP Inverso) */
+        /* Coluna Direita */
         .coluna-direita {
             display: flex;
             flex-direction: column;
-            gap: 10px; /* Espaçamento entre os cards */
-            width: 100%; /* Ocupa 100% da largura em dispositivos móveis */
+            gap: 10px;
+            width: 100%;
         }
 
         /* Cards */
@@ -99,8 +101,8 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 10px; /* Espaçamento interno */
-            flex: 1; /* Faz os cards terem a mesma altura */
+            gap: 10px;
+            flex: 1;
         }
 
         .card h2 {
@@ -171,11 +173,11 @@
             flex-direction: column;
             gap: 5px;
             overflow-y: auto;
-            max-height: 100px; /* Altura máxima para o resultado */
+            max-height: 100px;
         }
 
         .coluna-direita .resultado {
-            max-height: 200px; /* Altura maior para o CNPJ */
+            max-height: 200px;
         }
 
         .resultado p {
@@ -200,7 +202,6 @@
             border: 1px solid #ccc;
         }
 
-        /* Descrição dos Dados */
         .descricao-dados {
             margin-top: 10px;
             padding: 10px;
@@ -238,17 +239,16 @@
         /* Responsividade */
         @media (min-width: 768px) {
             .coluna-esquerda {
-                width: calc(60% - 10px); /* 60% da largura em telas maiores */
+                width: calc(60% - 10px);
             }
 
             .coluna-direita {
-                width: calc(40% - 10px); /* 40% da largura em telas maiores */
+                width: calc(40% - 10px);
             }
         }
     </style>
 </head>
 <body>
-
     <!-- Fundo de partículas -->
     <div id="particles-js"></div>
 
@@ -387,6 +387,9 @@
     </div>
 
     <script>
+        // Inicialização do Vercel Analytics
+        window.va = window.va || function() { (window.vaq = window.vaq || []).push(arguments); };
+
         // Configuração das partículas
         particlesJS("particles-js", {
             "particles": {
@@ -448,7 +451,7 @@
 
         // Função para formatar CNPJ e NCM
         function formatarCodigo(codigo) {
-            return codigo.replace(/\D/g, ''); // Remove pontos, barras e traços
+            return codigo.replace(/\D/g, '');
         }
 
         // Função para ativar/desativar o spinner de carregamento
@@ -464,27 +467,27 @@
 
         // Mapeamento de CFOPs
         const mapeamentoCFOP = {
-            "1101": { venda: "5101", vendaFora: "6101" }, // Compra para industrialização
-            "1102": { venda: "5102", vendaFora: "6102" }, // Compra para comercialização
-            "1111": { venda: "5111", vendaFora: "6111" }, // Compra para industrialização de bem usado
-            "1113": { venda: "5113", vendaFora: "6113" }, // Compra para comercialização de bem usado
-            "1201": { venda: "5201", vendaFora: "6201" }, // Devolução de venda para industrialização
-            "1202": { venda: "5202", vendaFora: "6202" }, // Devolução de venda para comercialização
-            "1251": { venda: "5251", vendaFora: "6251" }, // Compra de energia elétrica
-            "1401": { venda: "5401", vendaFora: "6401" }, // Transferência para industrialização
-            "1403": { venda: "5403", vendaFora: "6403" }, // Transferência para comercialização
-            "1411": { venda: "5411", vendaFora: "6411" }, // Transferência de bem usado para industrialização
-            "1413": { venda: "5413", vendaFora: "6413" }, // Transferência de bem usado para comercialização
-            "2101": { venda: "5101", vendaFora: "6101" }, // Compra para industrialização (outro estado)
-            "2102": { venda: "5102", vendaFora: "6102" }, // Compra para comercialização (outro estado)
-            "2111": { venda: "5111", vendaFora: "6111" }, // Compra para industrialização de bem usado (outro estado)
-            "2113": { venda: "5113", vendaFora: "6113" }, // Compra para comercialização de bem usado (outro estado)
-            "2201": { venda: "5201", vendaFora: "6201" }, // Devolução de venda para industrialização (outro estado)
-            "2202": { venda: "5202", vendaFora: "6202" }, // Devolução de venda para comercialização (outro estado)
-            "2401": { venda: "5401", vendaFora: "6401" }, // Transferência para industrialização (outro estado)
-            "2403": { venda: "5403", vendaFora: "6403" }, // Transferência para comercialização (outro estado)
-            "2411": { venda: "5411", vendaFora: "6411" }, // Transferência de bem usado para industrialização (outro estado)
-            "2413": { venda: "5413", vendaFora: "6413" }, // Transferência de bem usado para comercialização (outro estado)
+            "1101": { venda: "5101", vendaFora: "6101" },
+            "1102": { venda: "5102", vendaFora: "6102" },
+            "1111": { venda: "5111", vendaFora: "6111" },
+            "1113": { venda: "5113", vendaFora: "6113" },
+            "1201": { venda: "5201", vendaFora: "6201" },
+            "1202": { venda: "5202", vendaFora: "6202" },
+            "1251": { venda: "5251", vendaFora: "6251" },
+            "1401": { venda: "5401", vendaFora: "6401" },
+            "1403": { venda: "5403", vendaFora: "6403" },
+            "1411": { venda: "5411", vendaFora: "6411" },
+            "1413": { venda: "5413", vendaFora: "6413" },
+            "2101": { venda: "5101", vendaFora: "6101" },
+            "2102": { venda: "5102", vendaFora: "6102" },
+            "2111": { venda: "5111", vendaFora: "6111" },
+            "2113": { venda: "5113", vendaFora: "6113" },
+            "2201": { venda: "5201", vendaFora: "6201" },
+            "2202": { venda: "5202", vendaFora: "6202" },
+            "2401": { venda: "5401", vendaFora: "6401" },
+            "2403": { venda: "5403", vendaFora: "6403" },
+            "2411": { venda: "5411", vendaFora: "6411" },
+            "2413": { venda: "5413", vendaFora: "6413" },
         };
 
         // Função para consultar CFOP Inverso
@@ -499,7 +502,6 @@
                 return;
             }
 
-            // Verifica se o CFOP de entrada existe no mapeamento
             if (mapeamentoCFOP[cfopEntrada]) {
                 resultadoCFOPVenda.textContent = mapeamentoCFOP[cfopEntrada].venda || '-';
                 resultadoCFOPVendaFora.textContent = mapeamentoCFOP[cfopEntrada].vendaFora || '-';
@@ -644,6 +646,5 @@
             }
         }
     </script>
-
 </body>
 </html>
